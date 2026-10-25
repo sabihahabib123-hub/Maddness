@@ -1,26 +1,231 @@
 @import "tailwindcss";
+@import "../components/arc/foundation.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * MADNESS design tokens.
+ * The palette below is PROPOSED, not confirmed brand colours. Change a value
+ * here and it updates every public page. `neon` was sampled from the magenta
+ * neon signage and logo seen in the restaurant's own photos.
+ * Admin screens use Arc components, themed by Arc's foundation tokens
+ * (data-theme="dark" on <html>) with the accent mapped to the brand red below.
+ */
+@theme {
+  --color-obsidian: #101010;
+  --color-charcoal: #1b1b1b;
+  --color-ink: #232323;
+  --color-cream: #f7f4ee;
+  --color-red: #f04438;
+  --color-red-strong: #c9271c;
+  --color-gold: #ffc857;
+  --color-neon: #e63ba8;
+  --color-muted: #a7a7a7;
+  --color-line: #343434;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --font-heading: var(--font-bebas), "Impact", "Arial Narrow", sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Typography scale for display headings (fluid). */
+  --text-display-xl: clamp(3.25rem, 9vw, 8rem);
+  --text-display-xl--line-height: 0.88;
+  --text-display-lg: clamp(2.75rem, 6.5vw, 5.5rem);
+  --text-display-lg--line-height: 0.92;
+  --text-display-md: clamp(2.25rem, 4.5vw, 3.75rem);
+  --text-display-md--line-height: 0.95;
+  --text-display-sm: clamp(1.75rem, 3vw, 2.25rem);
+  --text-display-sm--line-height: 1;
+
+  /* Page widths. */
+  --container-page: 80rem;
+  --container-prose: 44rem;
+
+  /* Radii: deliberately restrained. */
+  --radius-card: 1.25rem;
+  --radius-btn: 0.75rem;
+
+  /* Comic-panel offset shadow used on cards and CTAs. */
+  --shadow-panel: 6px 6px 0 0 #000;
+  --shadow-panel-red: 6px 6px 0 0 var(--color-red);
+
+  --breakpoint-xs: 26rem;
+
+  --animate-kenburns: kenburns 9s ease-out both;
+  --animate-marquee: marquee 40s linear infinite;
+  @keyframes kenburns {
+    from { transform: scale(1.12); }
+    to { transform: scale(1); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
 }
 
+/* Arc reads its fonts from these two variables; keep the admin on Manrope. */
+:root {
+  --font-geist: var(--font-manrope);
+  --font-inter: var(--font-manrope);
+}
+:root[data-theme="dark"][data-accent="coral"] {
+  --accent: #ff6b5f;
+  --accent-strong: #ff9a90;
+  --accent-subtle: rgb(240 68 56 / 0.2);
+  --control-on: #f04438;
+  --control-fill: #f04438;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-obsidian);
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-red);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer components {
+  /* Layout */
+  .container-page {
+    width: 100%;
+    max-width: var(--container-page);
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 40rem) { .container-page { padding-inline: 1.5rem; } }
+  @media (min-width: 64rem) { .container-page { padding-inline: 2rem; } }
+
+  .section { padding-block: clamp(4rem, 9vw, 7.5rem); }
+
+  /* Headings */
+  .display {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+  }
+
+  /* Buttons (public site). Arc's Button is used in the admin. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-btn);
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, color 160ms ease;
+    white-space: nowrap;
+  }
+  .btn:active { transform: translate(2px, 2px); }
+  .btn-primary {
+    background: var(--color-red);
+    color: #fff;
+    box-shadow: 4px 4px 0 0 #000;
+  }
+  .btn-primary:hover { background: var(--color-red-strong); box-shadow: 6px 6px 0 0 #000; transform: translate(-1px, -1px); }
+  .btn-gold {
+    background: var(--color-gold);
+    color: var(--color-obsidian);
+    box-shadow: 4px 4px 0 0 #000;
+  }
+  .btn-gold:hover { box-shadow: 6px 6px 0 0 #000; transform: translate(-1px, -1px); }
+  .btn-outline {
+    border: 2px solid currentColor;
+    color: var(--color-cream);
+  }
+  .btn-outline:hover { background: var(--color-cream); color: var(--color-obsidian); border-color: var(--color-cream); }
+  .btn-dark {
+    background: var(--color-obsidian);
+    color: var(--color-cream);
+  }
+  .btn-dark:hover { background: var(--color-ink); }
+  .btn-sm { min-height: 2.5rem; padding: 0.5rem 1rem; font-size: 1.05rem; }
+
+  /* Visible keyboard focus for every interactive element on the public site. */
+  .focus-ring:focus-visible,
+  .btn:focus-visible,
+  .field:focus-visible {
+    outline: 3px solid var(--color-gold) !important;
+    outline-offset: 3px !important;
+  }
+
+  /* Form fields (public site) */
+  .field {
+    width: 100%;
+    min-height: 3rem;
+    border-radius: 0.75rem;
+    border: 1.5px solid var(--color-line);
+    background: var(--color-charcoal);
+    color: var(--color-cream);
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: border-color 160ms ease;
+  }
+  .field::placeholder { color: #7d7d7d; }
+  .field:hover { border-color: #4a4a4a; }
+  .field:focus { border-color: var(--color-gold); outline: none; }
+  .field[aria-invalid="true"] { border-color: var(--color-red); }
+  .label { display: block; margin-bottom: 0.4rem; font-size: 0.875rem; font-weight: 600; color: var(--color-cream); }
+  .hint { margin-top: 0.35rem; font-size: 0.8125rem; color: var(--color-muted); }
+  .error-text { margin-top: 0.35rem; font-size: 0.8125rem; font-weight: 600; color: #ff7b72; }
+
+  /* Light sections use a cream ground with obsidian ink. */
+  .on-light .field { background: #fff; color: var(--color-obsidian); border-color: #d9d3c7; }
+  .on-light .label { color: var(--color-obsidian); }
+  .on-light .hint { color: #5d5a55; }
+
+  /* Comic-book flourishes, used sparingly. */
+  .halftone {
+    background-image: radial-gradient(rgb(255 255 255 / 0.13) 1px, transparent 1.3px);
+    background-size: 10px 10px;
+  }
+  .halftone-dark {
+    background-image: radial-gradient(rgb(0 0 0 / 0.11) 1px, transparent 1.3px);
+    background-size: 10px 10px;
+  }
+  .panel {
+    border: 2px solid #000;
+    box-shadow: var(--shadow-panel);
+  }
+  .burst {
+    clip-path: polygon(50% 0%, 61% 18%, 82% 9%, 79% 31%, 100% 35%, 84% 52%, 98% 70%, 76% 72%, 74% 95%, 56% 82%, 40% 100%, 34% 79%, 12% 88%, 17% 66%, 0% 57%, 17% 43%, 4% 24%, 25% 24%, 27% 3%, 44% 17%);
+  }
+  .neon-text {
+    color: #ffd6f0;
+    text-shadow: 0 0 6px rgb(230 59 168 / 0.9), 0 0 18px rgb(230 59 168 / 0.55);
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, #1d1d1d 0%, #2a2a2a 50%, #1d1d1d 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
 }
